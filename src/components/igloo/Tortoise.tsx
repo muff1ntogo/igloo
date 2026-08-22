@@ -23,6 +23,7 @@ export function Tortoise({
     return () => clearTimeout(t);
   }, [status]);
 
+  const dims = size === "lg" ? 96 : size === "sm" ? 44 : 64;
   const px = size === "lg" ? "size-24" : size === "sm" ? "size-11" : "size-16";
   const shell =
     status === "good"
@@ -42,6 +43,8 @@ export function Tortoise({
     >
       <svg
         viewBox="0 0 96 80"
+        width={dims}
+        height={dims}
         className={cn(px, shell, tilt, "transition-transform duration-300")}
         role="img"
         aria-label={`Tortoise mascot, ${status} status`}

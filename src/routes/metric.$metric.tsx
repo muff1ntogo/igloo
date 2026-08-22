@@ -287,6 +287,21 @@ function Gauge({ metric, current }: { metric: MetricKey; current: number }) {
   const span = d.max - d.min;
   const pct = (v: number) => Math.min(100, Math.max(0, ((v - d.min) / span) * 100));
 
+  // Assign zone labels to staggered rows so neighbours never overlap.
+  const placed: number[][] = [[], [], []];
+  const rows = d.zones.map((z) => {
+    const mid = (pct(z.from) + pct(z.to)) / 2;
+    for (let r = 0; r < 3; r++) {
+      if (placed[r]!.every((p) => Math.abs(p - mid) > 17)) {
+        placed[r]!.push(mid);
+        return { z, mid, row: r };
+      }
+    }
+    return { z, mid, row: -1 };
+  });
+  const labelRows = rows.filter((r) => r.row >= 0);
+  const rowCount = Math.max(1, ...labelRows.map((r) => r.row + 1));
+
   return (
     <div className="mt-4">
       <div className="relative h-5 w-full">
@@ -302,7 +317,7 @@ function Gauge({ metric, current }: { metric: MetricKey; current: number }) {
                     ? "bg-watch"
                     : "bg-urgent",
               )}
-              style={{ width: `${pct(z.to) - pct(z.from)}%`, opacity: z.status === "watch" && z.name !== "Elevated" ? 0.75 : 1 }}
+              style={{ width: `${pct(z.to) - pct(z.from)}%` }}
             />
           ))}
         </div>
@@ -317,19 +332,25 @@ function Gauge({ metric, current }: { metric: MetricKey; current: number }) {
           style={{ left: `${pct(current)}%`, backgroundColor: `var(--color-${metric})` }}
         />
       </div>
-      <div className="relative mt-2 h-9 text-[11px] font-bold text-muted-foreground">
-        {d.zones.map((z, i) => (
+      <div
+        className="relative mt-2 text-[11px] leading-snug font-bold text-muted-foreground"
+        style={{ height: `${rowCount * 18 + 14}px` }}
+      >
+        {labelRows.map(({ z, mid, row }) => (
           <span
             key={z.name}
-            className="absolute -translate-x-1/2 text-center leading-tight"
-            style={{ left: `${(pct(z.from) + pct(z.to)) / 2}%` }}
+            className="absolute -translate-x-1/2 text-center"
+            style={{ left: `${Math.min(88, Math.max(12, mid))}%`, top: row * 18 }}
           >
             {z.name}
-            {i === 0 || i === d.zones.length - 1 ? (
-              <span className="block font-semibold">{i === 0 ? d.min : d.max}</span>
-            ) : null}
           </span>
         ))}
+        <span className="absolute left-0" style={{ top: (rowCount - 1) * 18 + 16 }}>
+          {d.min}
+        </span>
+        <span className="absolute right-0" style={{ top: (rowCount - 1) * 18 + 16 }}>
+          {d.max}
+        </span>
       </div>
       {d.target ? (
         <p className="mt-1 text-xs font-semibold text-muted-foreground">
