@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FamilyRouteImport } from './routes/family'
 import { Route as LogRouteImport } from './routes/log'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as MetricMetricRouteImport } from './routes/metric.$metric'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetricMetricRoute = MetricMetricRouteImport.update({
+  id: '/metric/$metric',
+  path: '/metric/$metric',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/family': typeof FamilyRoute
   '/log': typeof LogRoute
   '/profile': typeof ProfileRoute
+  '/metric/$metric': typeof MetricMetricRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/family': typeof FamilyRoute
   '/log': typeof LogRoute
   '/profile': typeof ProfileRoute
+  '/metric/$metric': typeof MetricMetricRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/family': typeof FamilyRoute
   '/log': typeof LogRoute
   '/profile': typeof ProfileRoute
+  '/metric/$metric': typeof MetricMetricRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/family' | '/log' | '/profile'
+  fullPaths: '/' | '/family' | '/log' | '/profile' | '/metric/$metric'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/family' | '/log' | '/profile'
-  id: '__root__' | '/' | '/family' | '/log' | '/profile'
+  to: '/' | '/family' | '/log' | '/profile' | '/metric/$metric'
+  id: '__root__' | '/' | '/family' | '/log' | '/profile' | '/metric/$metric'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +76,7 @@ export interface RootRouteChildren {
   FamilyRoute: typeof FamilyRoute
   LogRoute: typeof LogRoute
   ProfileRoute: typeof ProfileRoute
+  MetricMetricRoute: typeof MetricMetricRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metric/$metric': {
+      id: '/metric/$metric'
+      path: '/metric/$metric'
+      fullPath: '/metric/$metric'
+      preLoaderRoute: typeof MetricMetricRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   FamilyRoute: FamilyRoute,
   LogRoute: LogRoute,
   ProfileRoute: ProfileRoute,
+  MetricMetricRoute: MetricMetricRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
