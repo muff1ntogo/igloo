@@ -99,7 +99,12 @@ function Dashboard() {
                 const r = latest[m];
                 const meta = METRICS[m];
                 return (
-                  <div key={m} className="card-igloo flex flex-col gap-3 p-4">
+                  <Link
+                    key={m}
+                    to="/metric/$metric"
+                    params={{ metric: m }}
+                    className="card-igloo flex flex-col gap-3 p-4"
+                  >
                     <MetricIcon metric={m} />
                     <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
                       {meta.label}
@@ -114,7 +119,7 @@ function Dashboard() {
                     ) : (
                       <p className="text-xs font-semibold text-muted-foreground">{DELTAS[m]}</p>
                     )}
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -154,13 +159,18 @@ function Dashboard() {
           <h2 className="text-base font-bold text-foreground">Trends, last 7 days</h2>
           <div className="grid grid-cols-2 gap-4">
             {(["bp", "glu"] as MetricKey[]).map((m) => (
-              <div key={m} className="card-igloo p-4">
+              <Link
+                key={m}
+                to="/metric/$metric"
+                params={{ metric: m }}
+                className="card-igloo p-4"
+              >
                 <p className="text-xs font-bold text-muted-foreground">{METRICS[m].label}</p>
                 <p className={cn("mt-1 text-sm font-bold", METRICS[m].text)}>
                   {TRENDS[m][TRENDS[m].length - 1]} {METRICS[m].unit}
                 </p>
                 <Sparkline data={TRENDS[m]} metric={m} className="mt-3" />
-              </div>
+              </Link>
             ))}
           </div>
         </section>
