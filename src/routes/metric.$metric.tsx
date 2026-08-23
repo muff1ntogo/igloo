@@ -329,7 +329,7 @@ function Gauge({ metric, current }: { metric: MetricKey; current: number }) {
         ) : null}
         <div
           className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-card shadow-[var(--shadow-soft)]"
-          style={{ left: `${pct(current)}%`, backgroundColor: `var(--color-${metric})` }}
+          style={{ left: `${pct(current)}%`, backgroundColor: `var(--${metric})` }}
         />
       </div>
       <div
@@ -384,7 +384,7 @@ function TrendChart({
     vals.map((v, i) => `${i === 0 ? "M" : "L"}${px(i).toFixed(2)} ${py(v).toFixed(2)}`).join(" ");
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 h-44 w-full text-foreground" aria-hidden="true">
+    <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 h-44 w-full" aria-hidden="true">
       {[0.25, 0.5, 0.75].map((f) => (
         <line
           key={f}
@@ -392,43 +392,48 @@ function TrendChart({
           x2={W - PAD}
           y1={H * f}
           y2={H * f}
-          stroke="var(--color-border)"
           strokeWidth="1"
+          style={{ stroke: "var(--border)" }}
         />
       ))}
       <path
         d={`${path(data)} L${px(data.length - 1).toFixed(2)} ${H} L${px(0).toFixed(2)} ${H} Z`}
-        fill={`var(--color-${metric}-tint)`}
+        style={{ fill: `var(--${metric}-tint)` }}
       />
       <path
         d={path(smooth)}
         fill="none"
-        stroke={`var(--color-${metric})`}
         strokeWidth="3.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         opacity="0.45"
+        style={{ stroke: `var(--${metric})` }}
       />
       <path
         d={path(data)}
         fill="none"
-        stroke={`var(--color-${metric})`}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        style={{ stroke: `var(--${metric})` }}
       />
       {data.map((v, i) =>
         i === 0 || i === data.length - 1 || i % Math.ceil(data.length / 6) === 0 ? (
-          <circle key={i} cx={px(i)} cy={py(v)} r="2.4" fill={`var(--color-${metric})`} />
+          <circle
+            key={i}
+            cx={px(i)}
+            cy={py(v)}
+            r="2.4"
+            style={{ fill: `var(--${metric})` }}
+          />
         ) : null,
       )}
       <circle
         cx={px(data.length - 1)}
         cy={py(data[data.length - 1]!)}
         r="4.5"
-        fill={`var(--color-${metric})`}
-        stroke="var(--color-card)"
         strokeWidth="2"
+        style={{ fill: `var(--${metric})`, stroke: "var(--card)" }}
       />
     </svg>
   );
@@ -454,10 +459,10 @@ function MiniSpark({
       <path
         d={line}
         fill="none"
-        stroke={`var(--color-${metric})`}
         strokeWidth="2"
         strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
+        style={{ stroke: `var(--${metric})` }}
       />
     </svg>
   );

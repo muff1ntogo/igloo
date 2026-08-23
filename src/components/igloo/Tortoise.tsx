@@ -62,7 +62,7 @@ export function Tortoise({
           opacity="0.9"
         />
         {/* shell plates */}
-        <g stroke="var(--color-card)" strokeWidth="2" fill="none" opacity="0.85">
+        <g stroke="var(--card)" strokeWidth="2" fill="none" opacity="0.85">
           <path d="M46 28v30" />
           <path d="M28 44c8-3 28-3 36 0" />
         </g>
@@ -74,11 +74,11 @@ export function Tortoise({
           <rect x="70" y="40" width="20" height="18" rx="9" fill="currentColor" opacity="0.62" />
           {status === "urgent" ? (
             <>
-              <path d="M76 47.5h3.4" stroke="var(--color-card)" strokeWidth="2.4" strokeLinecap="round" />
-              <path d="M83.6 47.5H87" stroke="var(--color-card)" strokeWidth="2.4" strokeLinecap="round" />
+              <path d="M76 47.5h3.4" stroke="var(--card)" strokeWidth="2.4" strokeLinecap="round" />
+              <path d="M83.6 47.5H87" stroke="var(--card)" strokeWidth="2.4" strokeLinecap="round" />
               <path
                 d="M78 54c2.4-2 5-2 7 0"
-                stroke="var(--color-card)"
+                stroke="var(--card)"
                 strokeWidth="2.2"
                 fill="none"
                 strokeLinecap="round"
@@ -86,11 +86,11 @@ export function Tortoise({
             </>
           ) : (
             <>
-              <circle cx="78" cy="47" r="1.7" fill="var(--color-card)" />
-              <circle cx="86" cy="47" r="1.7" fill="var(--color-card)" />
+              <circle cx="78" cy="47" r="1.7" fill="var(--card)" />
+              <circle cx="86" cy="47" r="1.7" fill="var(--card)" />
               <path
                 d={status === "good" ? "M78 52c2.5 2.4 5 2.4 7.5 0" : "M78.5 52.5h6.5"}
-                stroke="var(--color-card)"
+                stroke="var(--card)"
                 strokeWidth="2.2"
                 fill="none"
                 strokeLinecap="round"
