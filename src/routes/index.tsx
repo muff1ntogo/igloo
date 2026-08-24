@@ -1,14 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ChevronRight, TriangleAlert, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Check, ChevronRight, TriangleAlert, X } from "lucide-react";
 import {
   DELTAS,
+  dayKeyOf,
+  fullDateToday,
+  localISO,
   METRICS,
   METRIC_ORDER,
   STATUS_META,
   TRENDS,
-  WEEK_DAYS,
-  WEEK_LOGGED,
   type MetricKey,
 } from "@/lib/igloo-data";
 import { useIgloo, useLatest, worstStatus } from "@/lib/igloo-store";
@@ -34,19 +35,37 @@ export const Route = createFileRoute("/")({
   component: Dashboard,
 });
 
-const TODAY = "Friday, August 21";
-
 function Dashboard() {
-  const { simpleView, alertDismissed, dismissAlert } = useIgloo();
+  const { simpleView, alertDismissed, dismissAlert, readings, meds } = useIgloo();
   const latest = useLatest();
   const [mode, setMode] = useState<"delta" | "status">("status");
 
   const overall = worstStatus(METRIC_ORDER.map((m) => latest[m]?.status));
   const flagged = METRIC_ORDER.filter((m) => latest[m]?.status !== "good");
 
+  // Last 7 day keys, oldest first, ending today.
+  const week = useMemo(() => {
+    const days: { key: string; letter: string }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push({
+        key: localISO(d).slice(0, 10),
+        letter: d.toLocaleDateString("en-US", { weekday: "narrow" }),
+      });
+    }
+    return days;
+  }, []);
+
+  const measurementDays = useMemo(
+    () => new Set(readings.map((r) => dayKeyOf(r.at))),
+    [readings],
+  );
+  const medicationDays = useMemo(() => new Set(meds.map((m) => dayKeyOf(m.at))), [meds]);
+
   return (
     <main>
-      <PageHeader title="Good morning, Rosemary" subtitle={TODAY} />
+      <PageHeader title="Good morning, Rosemary" subtitle={fullDateToday()} />
 
       <div className="space-y-5 px-5 pt-2">
         {flagged.length > 0 && !alertDismissed ? (
