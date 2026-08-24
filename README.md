@@ -1,4 +1,4 @@
-# Igloo Vital Companion
+# Igloo
 
 Build a mobile-web front-end prototype for Igloo, a vitals-tracking
 
@@ -12,29 +12,35 @@ the real data layer separately.
 
 DESIGN SYSTEM — apply exactly and consistently across every screen:
 
-- Background #EEF2F0 (soft sage-mist). Cards #FFFFFF with a 1px #E2E8E4
+- Background: #EFF7F9. Cards: #FFFFFF with a 1px #DCEAEE border, soft shadow,
 
-  border and soft shadow, 20–24px corner radius.
+  22px corner radius.
 
-- Text: #22322D primary, #6F7D77 secondary/muted.
+- Ink (primary text, headings): #123247. Muted text: #5C7E8C.
 
-- Brand color (primary buttons, active states): #93304A, with a pale tint
+- Brand (primary buttons, "+" button, active tab, active segmented-control):
 
-  #F6E9EC for icon backgrounds and highlights.
+  #186787, with a soft tint #E3F1F5 for large fill backgrounds.
+
+- Brand-mid (avatars, secondary icon fills): #2087A8.
+
+- Brand-light (icon chips, secondary highlights): #2FC1D3.
+
+- Yellow accent: #FCD462, with pale tint #FBEFC6. Use sparingly for
+
+  secondary highlights (e.g., "Invite a family member" button, soft glow
+
+  behind mascot when status is "Good").
 
 - Per-metric colors, used consistently everywhere that metric appears —
 
-  icon, chart line, badge: Blood Pressure #B14A62, Heart Rate #C17A3B,
+  icon, chart line, badge: Blood Pressure, Heart Rate, Oxygen, Glucose —
 
-  Oxygen #2C7A78, Glucose #6B5B95, each with its own pale tint for icon
+  each with its own tint. Do not modify these.
 
-  circles.
+- Status colors, always paired with a text label: Good, Watch, Urgent —
 
-- Status colors, always paired with a text label, never color alone:
-
-  Good #457A5C, Watch #B0813A, Urgent #B03D3D, each with a pale tint for
-
-  badge backgrounds.
+  each with its own tint for badge backgrounds. Do not modify these.
 
 - Typography: clean sans-serif for all UI chrome and labels; serif ONLY
 

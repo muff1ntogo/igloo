@@ -3,9 +3,9 @@ import type { Status } from "@/lib/igloo-data";
 import { cn } from "@/lib/utils";
 
 /**
- * Igloo's mascot: a small round-shelled tortoise, flat-illustrated in
- * palette colours. Three calm expression states. Reusable anywhere a
- * status needs a friendly face (detail screen, dashboard alert banner).
+ * Igloo's mascot: a small round-shelled tortoise with a brand-blue shell.
+ * Three calm expression states. Reusable anywhere a status needs a friendly face.
+ * A soft yellow glow appears behind the tortoise when status is "good".
  */
 export function Tortoise({
   status,
@@ -25,12 +25,6 @@ export function Tortoise({
 
   const dims = size === "lg" ? 96 : size === "sm" ? 44 : 64;
   const px = size === "lg" ? "size-24" : size === "sm" ? "size-11" : "size-16";
-  const shell =
-    status === "good"
-      ? "text-good"
-      : status === "watch"
-        ? "text-watch"
-        : "text-urgent";
   const tilt = status === "watch" ? "rotate-[-6deg]" : "";
 
   return (
@@ -41,11 +35,22 @@ export function Tortoise({
         className,
       )}
     >
+      {/* Yellow glow behind tortoise when status is good */}
+      {status === "good" && (
+        <span
+          className={cn(
+            "absolute -inset-2 rounded-full bg-sun-tint blur-[8px] opacity-60 transition-opacity duration-300",
+            size === "lg" && "-inset-3",
+            size === "sm" && "-inset-1",
+          )}
+          aria-hidden="true"
+        />
+      )}
       <svg
         viewBox="0 0 96 80"
         width={dims}
         height={dims}
-        className={cn(px, shell, tilt, "transition-transform duration-300")}
+        className={cn(px, "text-primary", tilt, "transition-transform duration-300")}
         role="img"
         aria-label={`Tortoise mascot, ${status} status`}
       >
@@ -55,7 +60,7 @@ export function Tortoise({
           fill="currentColor"
           opacity="0.16"
         />
-        {/* shell */}
+        {/* shell - now brand blue */}
         <path
           d="M18 58c0-17 13-30 28-30s28 13 28 30z"
           fill="currentColor"

@@ -57,7 +57,7 @@ function FamilyPage() {
         <button
           type="button"
           onClick={() => toast.success("Invitation link copied — send it to your family.")}
-          className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-2xl bg-primary text-base font-bold text-primary-foreground transition-transform active:scale-[0.99]"
+          className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-2xl bg-sun text-base font-bold text-foreground transition-transform active:scale-[0.99]"
         >
           <UserPlus className="size-5" /> Invite a family member
         </button>

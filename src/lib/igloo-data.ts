@@ -3,6 +3,12 @@ export type Status = "good" | "watch" | "urgent";
 export type Method = "Scanned" | "Manual" | "Auto-synced";
 export type MedMethod = "Logged" | "Scanned";
 
+export type Category = "measurement" | "medication";
+
+export type LogEntry = 
+  | { type: "measurement"; data: Reading }
+  | { type: "medication"; data: MedLog };
+
 export type Reading = {
   id: string;
   metric: MetricKey;
