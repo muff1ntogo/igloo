@@ -1,7 +1,9 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import {
+  INITIAL_MEDS,
   INITIAL_READINGS,
   METRIC_ORDER,
+  type MedLog,
   type MetricKey,
   type Reading,
   type Status,
@@ -10,6 +12,8 @@ import {
 type Store = {
   readings: Reading[];
   addReading: (r: Omit<Reading, "id">) => void;
+  meds: MedLog[];
+  addMed: (m: Omit<MedLog, "id">) => void;
   simpleView: boolean;
   setSimpleView: (v: boolean) => void;
   shared: Record<MetricKey, boolean>;
@@ -24,6 +28,7 @@ const IglooContext = createContext<Store | null>(null);
 
 export function IglooProvider({ children }: { children: ReactNode }) {
   const [readings, setReadings] = useState<Reading[]>(INITIAL_READINGS);
+  const [meds, setMeds] = useState<MedLog[]>(INITIAL_MEDS);
   const [simpleView, setSimpleView] = useState(false);
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
@@ -39,6 +44,8 @@ export function IglooProvider({ children }: { children: ReactNode }) {
       readings,
       addReading: (r) =>
         setReadings((prev) => [{ ...r, id: `r-${Date.now()}` }, ...prev]),
+      meds,
+      addMed: (m) => setMeds((prev) => [{ ...m, id: `m-${Date.now()}` }, ...prev]),
       simpleView,
       setSimpleView,
       shared,
@@ -48,7 +55,7 @@ export function IglooProvider({ children }: { children: ReactNode }) {
       addOpen,
       setAddOpen,
     }),
-    [readings, simpleView, shared, alertDismissed, addOpen],
+    [readings, meds, simpleView, shared, alertDismissed, addOpen],
   );
 
   return <IglooContext.Provider value={value}>{children}</IglooContext.Provider>;
