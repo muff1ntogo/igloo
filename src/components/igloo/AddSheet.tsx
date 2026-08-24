@@ -179,13 +179,7 @@ export function AddSheet() {
   );
 }
 
-function PrimaryButton({
-  children,
-  onClick,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
+function PrimaryButton({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -225,13 +219,7 @@ function BigChoice({
   );
 }
 
-function MetricPicker({
-  value,
-  onChange,
-}: {
-  value: MetricKey;
-  onChange: (m: MetricKey) => void;
-}) {
+function MetricPicker({ value, onChange }: { value: MetricKey; onChange: (m: MetricKey) => void }) {
   return (
     <div className="grid grid-cols-2 gap-3">
       {METRIC_ORDER.map((m) => (

@@ -57,10 +57,7 @@ function Dashboard() {
     return days;
   }, []);
 
-  const measurementDays = useMemo(
-    () => new Set(readings.map((r) => dayKeyOf(r.at))),
-    [readings],
-  );
+  const measurementDays = useMemo(() => new Set(readings.map((r) => dayKeyOf(r.at))), [readings]);
   const medicationDays = useMemo(() => new Set(meds.map((m) => dayKeyOf(m.at))), [meds]);
 
   return (
@@ -148,17 +145,22 @@ function Dashboard() {
         <section className="card-igloo p-5">
           <div className="flex items-baseline justify-between">
             <h2 className="text-base font-bold text-foreground">This week</h2>
-            <p className="text-xs font-semibold text-muted-foreground">6 of 7 days logged</p>
+            <p className="text-xs font-semibold text-muted-foreground">
+              {week.filter((d) => measurementDays.has(d.key) || medicationDays.has(d.key)).length}{" "}
+              of 7 days logged
+            </p>
           </div>
           <div className="mt-4 flex justify-between">
-            {WEEK_DAYS.map((d, i) => {
-              const count = WEEK_LOGGED[i] ?? 0;
+            {week.map((day, i) => {
+              const hasMeasurement = measurementDays.has(day.key);
+              const hasMedication = medicationDays.has(day.key);
+              const count = (hasMeasurement ? 1 : 0) + (hasMedication ? 1 : 0);
               return (
                 <div key={i} className="flex flex-col items-center gap-2">
                   <div
                     className={cn(
                       "flex size-10 items-center justify-center rounded-full text-sm font-bold",
-                      count >= 3
+                      count >= 2
                         ? "bg-primary text-primary-foreground"
                         : count > 0
                           ? "bg-primary-tint text-primary"
@@ -167,7 +169,9 @@ function Dashboard() {
                   >
                     {count > 0 ? count : "–"}
                   </div>
-                  <span className="text-[11px] font-semibold text-muted-foreground">{d}</span>
+                  <span className="text-[11px] font-semibold text-muted-foreground">
+                    {day.letter}
+                  </span>
                 </div>
               );
             })}
@@ -178,12 +182,7 @@ function Dashboard() {
           <h2 className="text-base font-bold text-foreground">Trends, last 7 days</h2>
           <div className="grid grid-cols-2 gap-4">
             {(["bp", "glu"] as MetricKey[]).map((m) => (
-              <Link
-                key={m}
-                to="/metric/$metric"
-                params={{ metric: m }}
-                className="card-igloo p-4"
-              >
+              <Link key={m} to="/metric/$metric" params={{ metric: m }} className="card-igloo p-4">
                 <p className="text-xs font-bold text-muted-foreground">{METRICS[m].label}</p>
                 <p className={cn("mt-1 text-sm font-bold", METRICS[m].text)}>
                   {TRENDS[m][TRENDS[m].length - 1]} {METRICS[m].unit}
@@ -214,7 +213,11 @@ function SimpleCard({ overall }: { overall: "good" | "watch" | "urgent" }) {
       <div
         className={cn(
           "mx-auto flex size-20 items-center justify-center rounded-full",
-          overall === "good" ? "bg-good-tint" : overall === "watch" ? "bg-watch-tint" : "bg-urgent-tint",
+          overall === "good"
+            ? "bg-good-tint"
+            : overall === "watch"
+              ? "bg-watch-tint"
+              : "bg-urgent-tint",
         )}
       >
         <span className={cn("font-serif text-3xl", meta.text)}>

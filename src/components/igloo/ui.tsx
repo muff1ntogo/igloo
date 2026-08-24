@@ -75,13 +75,7 @@ export function StatusBadge({ status, className }: { status: Status; className?:
   );
 }
 
-export function MetricIcon({
-  metric,
-  size = "md",
-}: {
-  metric: MetricKey;
-  size?: "md" | "lg";
-}) {
+export function MetricIcon({ metric, size = "md" }: { metric: MetricKey; size?: "md" | "lg" }) {
   const Icon = METRIC_ICONS[metric];
   const m = METRICS[metric];
   return (
@@ -114,7 +108,9 @@ export function Sparkline({
     const y = 30 - ((v - min) / span) * 24 - 3;
     return [x, y] as const;
   });
-  const line = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`).join(" ");
+  const line = pts
+    .map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`)
+    .join(" ");
   const area = `${line} L100 30 L0 30 Z`;
   const last = pts[pts.length - 1] ?? ([0, 0] as const);
 
@@ -135,7 +131,13 @@ export function Sparkline({
         strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
       />
-      <circle cx={last[0]} cy={last[1]} r="1.8" fill="currentColor" vectorEffect="non-scaling-stroke" />
+      <circle
+        cx={last[0]}
+        cy={last[1]}
+        r="1.8"
+        fill="currentColor"
+        vectorEffect="non-scaling-stroke"
+      />
     </svg>
   );
 }

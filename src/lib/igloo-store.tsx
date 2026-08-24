@@ -42,8 +42,7 @@ export function IglooProvider({ children }: { children: ReactNode }) {
   const value = useMemo<Store>(
     () => ({
       readings,
-      addReading: (r) =>
-        setReadings((prev) => [{ ...r, id: `r-${Date.now()}` }, ...prev]),
+      addReading: (r) => setReadings((prev) => [{ ...r, id: `r-${Date.now()}` }, ...prev]),
       meds,
       addMed: (m) => setMeds((prev) => [{ ...m, id: `m-${Date.now()}` }, ...prev]),
       simpleView,

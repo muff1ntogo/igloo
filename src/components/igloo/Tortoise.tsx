@@ -55,17 +55,9 @@ export function Tortoise({
         aria-label={`Tortoise mascot, ${status} status`}
       >
         {/* body */}
-        <path
-          d="M14 60c0-16 14-28 32-28s32 12 32 28z"
-          fill="currentColor"
-          opacity="0.16"
-        />
+        <path d="M14 60c0-16 14-28 32-28s32 12 32 28z" fill="currentColor" opacity="0.16" />
         {/* shell - now brand blue */}
-        <path
-          d="M18 58c0-17 13-30 28-30s28 13 28 30z"
-          fill="currentColor"
-          opacity="0.9"
-        />
+        <path d="M18 58c0-17 13-30 28-30s28 13 28 30z" fill="currentColor" opacity="0.9" />
         {/* shell plates */}
         <g stroke="var(--card)" strokeWidth="2" fill="none" opacity="0.85">
           <path d="M46 28v30" />
@@ -80,7 +72,12 @@ export function Tortoise({
           {status === "urgent" ? (
             <>
               <path d="M76 47.5h3.4" stroke="var(--card)" strokeWidth="2.4" strokeLinecap="round" />
-              <path d="M83.6 47.5H87" stroke="var(--card)" strokeWidth="2.4" strokeLinecap="round" />
+              <path
+                d="M83.6 47.5H87"
+                stroke="var(--card)"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
               <path
                 d="M78 54c2.4-2 5-2 7 0"
                 stroke="var(--card)"

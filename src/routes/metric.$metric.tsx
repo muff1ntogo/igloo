@@ -255,15 +255,13 @@ function DeltaArrow({ delta, className }: { delta: number; className?: string })
   return <Minus className={cn("text-muted-foreground", className)} />;
 }
 
-function RangeSelect({
-  value,
-  onChange,
-}: {
-  value: RangeKey;
-  onChange: (v: RangeKey) => void;
-}) {
+function RangeSelect({ value, onChange }: { value: RangeKey; onChange: (v: RangeKey) => void }) {
   return (
-    <div className="flex rounded-full border border-border bg-background p-1" role="group" aria-label="Time range">
+    <div
+      className="flex rounded-full border border-border bg-background p-1"
+      role="group"
+      aria-label="Time range"
+    >
       {RANGES.map((r) => (
         <button
           key={r}
@@ -311,11 +309,7 @@ function Gauge({ metric, current }: { metric: MetricKey; current: number }) {
               key={z.name}
               className={cn(
                 "h-full",
-                z.status === "good"
-                  ? "bg-good"
-                  : z.status === "watch"
-                    ? "bg-watch"
-                    : "bg-urgent",
+                z.status === "good" ? "bg-good" : z.status === "watch" ? "bg-watch" : "bg-urgent",
               )}
               style={{ width: `${pct(z.to) - pct(z.from)}%` }}
             />
@@ -324,7 +318,10 @@ function Gauge({ metric, current }: { metric: MetricKey; current: number }) {
         {d.target ? (
           <div
             className="absolute top-0 h-5 rounded-full border-2 border-primary/70"
-            style={{ left: `${pct(d.target.from)}%`, width: `${pct(d.target.to) - pct(d.target.from)}%` }}
+            style={{
+              left: `${pct(d.target.from)}%`,
+              width: `${pct(d.target.to) - pct(d.target.from)}%`,
+            }}
           />
         ) : null}
         <div
@@ -419,13 +416,7 @@ function TrendChart({
       />
       {data.map((v, i) =>
         i === 0 || i === data.length - 1 || i % Math.ceil(data.length / 6) === 0 ? (
-          <circle
-            key={i}
-            cx={px(i)}
-            cy={py(v)}
-            r="2.4"
-            style={{ fill: `var(--${metric})` }}
-          />
+          <circle key={i} cx={px(i)} cy={py(v)} r="2.4" style={{ fill: `var(--${metric})` }} />
         ) : null,
       )}
       <circle
@@ -452,7 +443,10 @@ function MiniSpark({
   const max = Math.max(...data);
   const span = max - min || 1;
   const line = data
-    .map((v, i) => `${i === 0 ? "M" : "L"}${((i / (data.length - 1)) * 100).toFixed(2)} ${(26 - ((v - min) / span) * 20).toFixed(2)}`)
+    .map(
+      (v, i) =>
+        `${i === 0 ? "M" : "L"}${((i / (data.length - 1)) * 100).toFixed(2)} ${(26 - ((v - min) / span) * 20).toFixed(2)}`,
+    )
     .join(" ");
   return (
     <svg viewBox="0 0 100 28" preserveAspectRatio="none" className={className} aria-hidden="true">
