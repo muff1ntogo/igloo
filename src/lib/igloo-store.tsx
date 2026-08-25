@@ -22,6 +22,9 @@ type Store = {
   dismissAlert: () => void;
   addOpen: boolean;
   setAddOpen: (v: boolean) => void;
+  /** Pre-filled slot for the add sheet: day key + hour, or null for "now". */
+  addSlot: { dayKey: string; hour: number } | null;
+  openAdd: (slot?: { dayKey: string; hour: number }) => void;
 };
 
 const IglooContext = createContext<Store | null>(null);
