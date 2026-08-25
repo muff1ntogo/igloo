@@ -22,6 +22,9 @@ type Store = {
   dismissAlert: () => void;
   addOpen: boolean;
   setAddOpen: (v: boolean) => void;
+  /** Pre-filled slot for the add sheet: day key + hour, or null for "now". */
+  addSlot: { dayKey: string; hour: number } | null;
+  openAdd: (slot?: { dayKey: string; hour: number }) => void;
 };
 
 const IglooContext = createContext<Store | null>(null);
@@ -32,6 +35,7 @@ export function IglooProvider({ children }: { children: ReactNode }) {
   const [simpleView, setSimpleView] = useState(false);
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [addSlot, setAddSlot] = useState<{ dayKey: string; hour: number } | null>(null);
   const [shared, setShared] = useState<Record<MetricKey, boolean>>({
     bp: true,
     hr: true,
@@ -52,9 +56,17 @@ export function IglooProvider({ children }: { children: ReactNode }) {
       alertDismissed,
       dismissAlert: () => setAlertDismissed(true),
       addOpen,
-      setAddOpen,
+      setAddOpen: (v) => {
+        if (!v) setAddSlot(null);
+        setAddOpen(v);
+      },
+      addSlot,
+      openAdd: (slot) => {
+        setAddSlot(slot ?? null);
+        setAddOpen(true);
+      },
     }),
-    [readings, meds, simpleView, shared, alertDismissed, addOpen],
+    [readings, meds, simpleView, shared, alertDismissed, addOpen, addSlot],
   );
 
   return <IglooContext.Provider value={value}>{children}</IglooContext.Provider>;
