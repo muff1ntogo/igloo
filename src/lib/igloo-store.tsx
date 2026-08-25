@@ -35,6 +35,7 @@ export function IglooProvider({ children }: { children: ReactNode }) {
   const [simpleView, setSimpleView] = useState(false);
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [addSlot, setAddSlot] = useState<{ dayKey: string; hour: number } | null>(null);
   const [shared, setShared] = useState<Record<MetricKey, boolean>>({
     bp: true,
     hr: true,
