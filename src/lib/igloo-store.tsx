@@ -56,9 +56,17 @@ export function IglooProvider({ children }: { children: ReactNode }) {
       alertDismissed,
       dismissAlert: () => setAlertDismissed(true),
       addOpen,
-      setAddOpen,
+      setAddOpen: (v) => {
+        if (!v) setAddSlot(null);
+        setAddOpen(v);
+      },
+      addSlot,
+      openAdd: (slot) => {
+        setAddSlot(slot ?? null);
+        setAddOpen(true);
+      },
     }),
-    [readings, meds, simpleView, shared, alertDismissed, addOpen],
+    [readings, meds, simpleView, shared, alertDismissed, addOpen, addSlot],
   );
 
   return <IglooContext.Provider value={value}>{children}</IglooContext.Provider>;
