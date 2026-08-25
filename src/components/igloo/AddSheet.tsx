@@ -98,7 +98,7 @@ export function AddSheet() {
       toast.error("Please add the medication name.");
       return;
     }
-    addMed({ name: n, dose: medDose.trim() || "1 dose", method, at, photo: photo || undefined });
+    addMed({ name: n, dose: medDose.trim() || "1 dose", method, at, photo });
     setAddOpen(false);
     toast.success(`${n} saved to your log.`);
   };
