@@ -25,6 +25,9 @@ type Store = {
   /** Pre-filled slot for the add sheet: day key + hour, or null for "now". */
   addSlot: { dayKey: string; hour: number } | null;
   openAdd: (slot?: { dayKey: string; hour: number }) => void;
+  /** Patient profile for reports */
+  profile: { name: string; dob: string };
+  setProfile: (p: { name: string; dob: string }) => void;
 };
 
 const IglooContext = createContext<Store | null>(null);
@@ -41,6 +44,10 @@ export function IglooProvider({ children }: { children: ReactNode }) {
     hr: true,
     ox: false,
     glu: true,
+  });
+  const [profile, setProfile] = useState<{ name: string; dob: string }>({
+    name: "Rosemary Whitfield",
+    dob: "March 15, 1952",
   });
 
   const value = useMemo<Store>(
@@ -65,8 +72,10 @@ export function IglooProvider({ children }: { children: ReactNode }) {
         setAddSlot(slot ?? null);
         setAddOpen(true);
       },
+      profile,
+      setProfile,
     }),
-    [readings, meds, simpleView, shared, alertDismissed, addOpen, addSlot],
+    [readings, meds, simpleView, shared, alertDismissed, addOpen, addSlot, profile],
   );
 
   return <IglooContext.Provider value={value}>{children}</IglooContext.Provider>;

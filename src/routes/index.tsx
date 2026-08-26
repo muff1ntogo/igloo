@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Check, ChevronRight, TriangleAlert, X } from "lucide-react";
+import { Check, ChevronRight, FileText, TriangleAlert, X } from "lucide-react";
 import {
   DELTAS,
   dayKeyOf,
@@ -15,6 +15,7 @@ import {
 import { useIgloo, useLatest, worstStatus } from "@/lib/igloo-store";
 import { BigNumber, MetricIcon, PageHeader, Sparkline, StatusBadge } from "@/components/igloo/ui";
 import { cn } from "@/lib/utils";
+import { ReportSheet } from "@/components/igloo/ReportSheet";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,6 +40,7 @@ function Dashboard() {
   const { simpleView, alertDismissed, dismissAlert, readings, meds } = useIgloo();
   const latest = useLatest();
   const [mode, setMode] = useState<"delta" | "status">("status");
+  const [reportOpen, setReportOpen] = useState(false);
 
   const overall = worstStatus(METRIC_ORDER.map((m) => latest[m]?.status));
   const flagged = METRIC_ORDER.filter((m) => latest[m]?.status !== "good");
@@ -200,7 +202,28 @@ function Dashboard() {
           See your full log
           <ChevronRight className="size-5 text-muted-foreground" />
         </Link>
+
+        <button
+          type="button"
+          onClick={() => setReportOpen(true)}
+          className="card-igloo flex items-center justify-between p-5"
+        >
+          <div className="flex items-center gap-4">
+            <span className="flex size-12 items-center justify-center rounded-full bg-primary-tint">
+              <FileText className="size-6 text-primary" />
+            </span>
+            <div>
+              <p className="text-base font-bold text-foreground">Generate Report</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Create a health summary PDF for your doctor
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="size-5 text-muted-foreground" />
+        </button>
       </div>
+
+      <ReportSheet open={reportOpen} onOpenChange={setReportOpen} />
     </main>
   );
 }

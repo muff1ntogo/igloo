@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Bell,
+  Calendar,
   ChevronRight,
   HeartHandshake,
   LifeBuoy,
@@ -13,6 +14,16 @@ import { toast } from "sonner";
 import { IglooToggle } from "@/components/igloo/Toggle";
 import { useIgloo } from "@/lib/igloo-store";
 import { PageHeader, PulseLine } from "@/components/igloo/ui";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -33,6 +44,10 @@ export const Route = createFileRoute("/profile")({
 });
 
 const GROUPS = [
+  {
+    title: "Personal details",
+    rows: [{ icon: Calendar, label: "Date of birth", hint: "March 15, 1952" }],
+  },
   {
     title: "Preferences",
     rows: [
@@ -57,7 +72,15 @@ const GROUPS = [
 ];
 
 function ProfilePage() {
-  const { simpleView, setSimpleView } = useIgloo();
+  const { simpleView, setSimpleView, profile, setProfile } = useIgloo();
+  const [dobEditOpen, setDobEditOpen] = useState(false);
+  const [dobValue, setDobValue] = useState(profile.dob);
+
+  const handleDobSave = () => {
+    setProfile({ name: profile.name, dob: dobValue });
+    setDobEditOpen(false);
+    toast.success("Date of birth updated.");
+  };
 
   return (
     <main>
@@ -69,7 +92,7 @@ function ProfilePage() {
             RW
           </span>
           <div className="min-w-0">
-            <h2 className="text-lg font-bold text-foreground">Rosemary Whitfield</h2>
+            <h2 className="text-lg font-bold text-foreground">{profile.name}</h2>
             <p className="truncate text-sm font-semibold text-muted-foreground">
               rosemary.w@email.com
             </p>
@@ -100,23 +123,35 @@ function ProfilePage() {
               {g.title}
             </h2>
             <div className="card-igloo divide-y divide-border overflow-hidden">
-              {g.rows.map((r) => (
-                <button
-                  key={r.label}
-                  type="button"
-                  onClick={() => toast("Coming soon in the prototype.")}
-                  className="flex min-h-[60px] w-full items-center gap-4 px-5 py-3 text-left"
-                >
-                  <span className="flex size-11 items-center justify-center rounded-full bg-primary-tint">
-                    <r.icon className="size-5 text-primary" />
-                  </span>
-                  <span className="flex-1 text-base font-semibold text-foreground">{r.label}</span>
-                  {r.hint ? (
-                    <span className="text-sm font-semibold text-muted-foreground">{r.hint}</span>
-                  ) : null}
-                  <ChevronRight className="size-5 text-muted-foreground" />
-                </button>
-              ))}
+              {g.rows.map((r) => {
+                const isDob = r.label === "Date of birth";
+                return (
+                  <button
+                    key={r.label}
+                    type="button"
+                    onClick={
+                      isDob
+                        ? () => setDobEditOpen(true)
+                        : () => toast("Coming soon in the prototype.")
+                    }
+                    className={cn(
+                      "flex min-h-[60px] w-full items-center gap-4 px-5 py-3 text-left",
+                      isDob && "cursor-pointer",
+                    )}
+                  >
+                    <span className="flex size-11 items-center justify-center rounded-full bg-primary-tint">
+                      <r.icon className="size-5 text-primary" />
+                    </span>
+                    <span className="flex-1 text-base font-semibold text-foreground">
+                      {r.label}
+                    </span>
+                    {r.hint ? (
+                      <span className="text-sm font-semibold text-muted-foreground">{r.hint}</span>
+                    ) : null}
+                    <ChevronRight className="size-5 text-muted-foreground" />
+                  </button>
+                );
+              })}
             </div>
           </section>
         ))}
@@ -131,6 +166,36 @@ function ProfilePage() {
           </span>
           <span className="flex-1 text-base font-bold text-urgent">Sign out</span>
         </button>
+
+        {/* DOB Edit Dialog */}
+        <Dialog open={dobEditOpen} onOpenChange={setDobEditOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Date of Birth</DialogTitle>
+              <DialogDescription>This will appear on generated health reports.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <label className="text-sm font-semibold text-foreground">
+                Date of birth
+                <input
+                  type="date"
+                  value={dobValue}
+                  onChange={(e) => setDobValue(e.target.value)}
+                  className="mt-2 h-12 w-full rounded-2xl border border-input bg-background px-4 font-serif text-xl text-foreground outline-none focus:border-primary"
+                />
+              </label>
+            </div>
+            <DialogFooter>
+              <button
+                type="button"
+                onClick={handleDobSave}
+                className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 w-full"
+              >
+                Save
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </main>
   );

@@ -1,12 +1,6 @@
 import { createRoot } from "react-dom/client";
 import html2canvas from "html2canvas";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { PDF } from "@/lib/igloo-report";
 import { rollingAverage } from "@/lib/igloo-metric-detail";
 
@@ -35,7 +29,14 @@ function CaptureChart({ points, color, medTicks }: ChartSpec) {
   }));
 
   return (
-    <div style={{ width: W, background: PDF.white, color: PDF.ink, fontFamily: "Helvetica, Arial, sans-serif" }}>
+    <div
+      style={{
+        width: W,
+        background: PDF.white,
+        color: PDF.ink,
+        fontFamily: "Helvetica, Arial, sans-serif",
+      }}
+    >
       <LineChart
         width={W}
         height={H}

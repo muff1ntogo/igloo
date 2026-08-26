@@ -129,7 +129,14 @@ export type MetricSection = {
   label: string;
   unit: string;
   color: string;
-  rows: { dayKey: string; date: string; time: string; value: string; status: string; statusColor: string }[];
+  rows: {
+    dayKey: string;
+    date: string;
+    time: string;
+    value: string;
+    status: string;
+    statusColor: string;
+  }[];
   count: number;
   average: string;
   min: string;
@@ -203,7 +210,7 @@ export function buildReportData(
         statusColor: STATUS_HEX[r.status],
       })),
       points: list.map((r, i) => ({
-        label: i === 0 || i === list.length - 1 ? shortDate(dayKeyOf(r.at)) : shortDate(dayKeyOf(r.at)),
+        label: i === 0 || i === list.length - 1 ? shortDate(dayKeyOf(r.at)) : "",
         value: numericValue(metric, r.value),
       })),
     });

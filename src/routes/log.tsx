@@ -84,8 +84,12 @@ function LogPage() {
 
   const dayEntries = useMemo(() => {
     const list: Entry[] = [
-      ...readings.filter((r) => dayKeyOf(r.at) === selected).map((r) => ({ kind: "measurement" as const, item: r })),
-      ...meds.filter((m) => dayKeyOf(m.at) === selected).map((m) => ({ kind: "medication" as const, item: m })),
+      ...readings
+        .filter((r) => dayKeyOf(r.at) === selected)
+        .map((r) => ({ kind: "measurement" as const, item: r })),
+      ...meds
+        .filter((m) => dayKeyOf(m.at) === selected)
+        .map((m) => ({ kind: "medication" as const, item: m })),
     ];
     return list.sort((a, b) => a.item.at.localeCompare(b.item.at));
   }, [readings, meds, selected]);
