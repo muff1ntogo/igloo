@@ -193,7 +193,7 @@ export function buildReportData(
       latest: latest.value,
       latestAt: `${shortDate(dayKeyOf(latest.at))}, ${timeLabel(latest.at)}`,
       reference: REFERENCE_TEXT[metric],
-      target: target ? `${target.from}–${target.to} ${meta.unit}` : undefined,
+      ...(target ? { target: `${target.from}–${target.to} ${meta.unit}` } : {}),
       rows: list.map((r) => ({
         dayKey: dayKeyOf(r.at),
         date: shortDate(dayKeyOf(r.at)),
