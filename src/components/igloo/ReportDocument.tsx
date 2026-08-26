@@ -1,5 +1,5 @@
 import { Document, Image, Page, StyleSheet, Text, View, pdf } from "@react-pdf/renderer";
-import { PDF, longDate, type MetricSection, type ReportData } from "@/lib/igloo-report";
+import { PDF, METRIC_HEX, longDate, type MetricSection, type ReportData } from "@/lib/igloo-report";
 
 const s = StyleSheet.create({
   page: {
@@ -352,18 +352,6 @@ export function ReportDocument({
             ))}
           </View>
         )}
-
-        {combinedImage ? (
-          <>
-            <View style={s.hairline} />
-            <Text style={s.h2}>Combined view</Text>
-            <Text style={[s.statKey, { marginBottom: 4 }]}>
-              {data.sections[0]?.label ?? "Vitals"} trend shown with days on which medication was
-              logged. Shown together for reference only; no relationship is calculated or implied.
-            </Text>
-            <Image src={combinedImage} style={s.chart} />
-          </>
-        ) : null}
 
         <Footer generated={generated} />
       </Page>

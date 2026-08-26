@@ -285,6 +285,9 @@ function Gauge({ metric, current }: { metric: MetricKey; current: number }) {
   const span = d.max - d.min;
   const pct = (v: number) => Math.min(100, Math.max(0, ((v - d.min) / span) * 100));
 
+  // Determine which zone the current value falls into
+  const currentZone = zoneFor(metric, current);
+
   // Assign zone labels to staggered rows so neighbours never overlap.
   const placed: number[][] = [[], [], []];
   const rows = d.zones.map((z) => {
@@ -326,7 +329,15 @@ function Gauge({ metric, current }: { metric: MetricKey; current: number }) {
         ) : null}
         <div
           className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-card shadow-[var(--shadow-soft)]"
-          style={{ left: `${pct(current)}%`, backgroundColor: `var(--${metric})` }}
+          style={{
+            left: `${pct(current)}%`,
+            backgroundColor:
+              currentZone.status === "good"
+                ? "var(--good)"
+                : currentZone.status === "watch"
+                  ? "var(--watch)"
+                  : "var(--urgent)",
+          }}
         />
       </div>
       <div
