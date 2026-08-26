@@ -112,8 +112,17 @@ function LogPage() {
 
   // Start on the current week.
   useEffect(() => {
-    const el = stripRef.current;
-    if (el) el.scrollLeft = el.scrollWidth;
+    let raf = 0;
+    const snap = () => {
+      const el = stripRef.current;
+      if (!el) return;
+      el.scrollLeft = el.scrollWidth - el.clientWidth;
+    };
+    raf = requestAnimationFrame(() => {
+      snap();
+      raf = requestAnimationFrame(snap);
+    });
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   // Auto-scroll the timeline to the current hour, or the last logged entry.
@@ -137,7 +146,7 @@ function LogPage() {
         className="mt-2 flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {weeks.map((week, i) => (
-          <div key={i} className="flex w-full shrink-0 snap-center justify-between gap-1 px-5">
+          <div key={i} className="flex w-full shrink-0 snap-start justify-between gap-1 px-5">
             {week.map((d) => {
               const active = d.key === selected;
               const future = d.key > today;
