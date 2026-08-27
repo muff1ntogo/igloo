@@ -25,7 +25,37 @@ export const Route = createFileRoute("/family")({
 });
 
 function FamilyPage() {
-  const { shared, toggleShared } = useIgloo();
+  const { shared, toggleShared, simpleView } = useIgloo();
+
+  // Simple view: large avatar + name + plain-language status only
+  if (simpleView) {
+    return (
+      <main>
+        <PageHeader title="Your family" subtitle="Sharing with 3 people" />
+        <div className="space-y-5 px-5 pt-2">
+          <div className="space-y-5">
+            {FAMILY.map((f) => (
+              <article key={f.id} className="rounded-[22px] bg-card border border-border p-6">
+                <div className="flex items-start gap-5">
+                  <span className="flex size-20 shrink-0 items-center justify-center rounded-full bg-primary-tint font-serif text-2xl text-primary">
+                    {f.initials}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-2xl font-bold text-foreground leading-tight">{f.name}</h2>
+                    <p className="mt-1 text-lg text-foreground leading-relaxed">
+                      {f.status === "good"
+                        ? `${f.name.split(" ")[0]} is doing fine today`
+                        : `${f.name.split(" ")[0]} has a question about your readings`}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main>

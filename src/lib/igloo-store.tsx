@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, useEffect, type ReactNode } from "react";
 import {
   INITIAL_MEDS,
   INITIAL_READINGS,
@@ -49,6 +49,18 @@ export function IglooProvider({ children }: { children: ReactNode }) {
     name: "Rosemary Whitfield",
     dob: "March 15, 1952",
   });
+
+  // Persist simpleView to localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("igloo-simple-view");
+    if (stored !== null) {
+      setSimpleView(stored === "true");
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("igloo-simple-view", String(simpleView));
+  }, [simpleView]);
 
   const value = useMemo<Store>(
     () => ({

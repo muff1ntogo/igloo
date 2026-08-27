@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Bell,
   Calendar,
@@ -6,6 +6,7 @@ import {
   HeartHandshake,
   LifeBuoy,
   LogOut,
+  MessageSquare,
   Smartphone,
   Sun,
   Watch,
@@ -81,6 +82,75 @@ function ProfilePage() {
     setDobEditOpen(false);
     toast.success("Date of birth updated.");
   };
+
+  // Simple view: minimal profile
+  if (simpleView) {
+    return (
+      <main>
+        <PageHeader title="Profile" subtitle="Your Igloo" />
+        <div className="space-y-6 px-5 pt-2">
+          {/* Avatar and name - large */}
+          <div className="rounded-[22px] bg-card border border-border p-8 text-center">
+            <span className="mx-auto flex size-24 items-center justify-center rounded-full bg-primary-tint font-serif text-3xl text-primary">
+              RW
+            </span>
+            <h2 className="mt-4 text-2xl font-bold text-foreground leading-tight">
+              {profile.name}
+            </h2>
+            <p className="mt-2 text-lg text-foreground">rosemary.w@email.com</p>
+          </div>
+
+          {/* Simple View toggle - prominent and easy to turn off */}
+          <label className="rounded-[22px] bg-card border border-border flex cursor-pointer items-center gap-5 p-6">
+            <span className="flex-1">
+              <span className="block text-xl font-bold text-foreground">Simple view</span>
+              <span className="mt-2 block text-lg text-foreground leading-relaxed">
+                {simpleView
+                  ? "Currently ON — showing a simplified view of all screens"
+                  : "Currently OFF — showing the full app view"}
+              </span>
+            </span>
+            <IglooToggle
+              label="Simple view"
+              checked={simpleView}
+              onChange={(v) => {
+                setSimpleView(v);
+                toast.success(v ? "Simple view is on." : "Simple view is off.");
+              }}
+            />
+          </label>
+
+          {/* Contact a Family Member action */}
+          <Link
+            to="/family"
+            className="flex min-h-[80px] w-full items-center gap-5 rounded-[22px] bg-primary-tint px-6 text-left transition-colors active:bg-primary/20"
+          >
+            <span className="flex size-14 items-center justify-center rounded-full bg-primary">
+              <MessageSquare className="size-6 text-primary-foreground" />
+            </span>
+            <div className="flex-1">
+              <span className="block text-xl font-bold text-foreground">
+                Contact a Family Member
+              </span>
+              <span className="mt-1 block text-lg text-foreground">See who's following along</span>
+            </div>
+          </Link>
+
+          {/* Sign out - large */}
+          <button
+            type="button"
+            onClick={() => toast("Signed out (prototype).")}
+            className="flex min-h-[80px] w-full items-center gap-5 rounded-[22px] border border-border bg-card px-6 text-left transition-colors active:bg-muted"
+          >
+            <span className="flex size-14 items-center justify-center rounded-full bg-urgent-tint">
+              <LogOut className="size-6 text-urgent" />
+            </span>
+            <span className="text-xl font-bold text-urgent">Sign out</span>
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main>

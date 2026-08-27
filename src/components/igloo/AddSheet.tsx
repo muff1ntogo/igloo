@@ -32,7 +32,7 @@ function statusFor(metric: MetricKey, value: string): Status {
 }
 
 export function AddSheet() {
-  const { addOpen, setAddOpen, addReading, addMed, addSlot } = useIgloo();
+  const { addOpen, setAddOpen, addReading, addMed, addSlot, simpleView } = useIgloo();
   const [cat, setCat] = useState<Category>("measurement");
   const [step, setStep] = useState<Step>("choose");
   const [metric, setMetric] = useState<MetricKey>("bp");
@@ -117,6 +117,98 @@ export function AddSheet() {
           : cat === "medication"
             ? "Check the details"
             : "Check the reading";
+
+  // Simple view: minimal, big controls
+  if (simpleView) {
+    return (
+      <Drawer open={addOpen} onOpenChange={setAddOpen}>
+        <DrawerContent className="mx-auto max-w-md rounded-t-[28px] border-border bg-card px-6 pb-8">
+          <div className="pt-4 pb-4">
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setAddOpen(false)}
+                className="flex size-12 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <ChevronLeft className="size-6" />
+              </button>
+              <h1 className="flex-1 text-2xl font-bold tracking-tight text-foreground text-center">
+                {cat === "medication" ? "Log a medication" : "Add a reading"}
+              </h1>
+            </div>
+          </div>
+          <div className="space-y-4">
+            {cat === "measurement" ? (
+              <>
+                <div className="space-y-2">
+                  <MetricPicker value={metric} onChange={setMetric} />
+                </div>
+                <Field label="Reading">
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    placeholder={METRICS[metric].placeholder}
+                    className="mt-2 h-18 w-full rounded-2xl border border-input bg-background px-4 text-3xl font-serif font-bold text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary"
+                    inputMode="numeric"
+                  />
+                </Field>
+                <Field label="Time">
+                  <input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    className="mt-2 h-18 w-full rounded-2xl border border-input bg-background px-4 text-2xl font-bold text-foreground outline-none focus:border-primary"
+                  />
+                </Field>
+                <button
+                  type="button"
+                  onClick={() => saveMeasurement("Manual")}
+                  className="mt-6 flex min-h-[64px] w-full items-center justify-center gap-2 rounded-[22px] bg-primary text-xl font-bold text-primary-foreground transition-transform active:scale-[0.99]"
+                >
+                  <Check className="size-6" /> Save reading
+                </button>
+              </>
+            ) : (
+              <>
+                <Field label="Medication name">
+                  <input
+                    value={medName}
+                    onChange={(e) => setMedName(e.target.value)}
+                    placeholder="Metformin"
+                    className="mt-2 h-18 w-full rounded-2xl border border-input bg-background px-4 text-2xl font-bold text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary"
+                  />
+                </Field>
+                <Field label="Dose">
+                  <input
+                    value={medDose}
+                    onChange={(e) => setMedDose(e.target.value)}
+                    placeholder="500mg"
+                    className="mt-2 h-18 w-full rounded-2xl border border-input bg-background px-4 text-2xl font-bold text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary"
+                  />
+                </Field>
+                <Field label="Time">
+                  <input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    className="mt-2 h-18 w-full rounded-2xl border border-input bg-background px-4 text-2xl font-bold text-foreground outline-none focus:border-primary"
+                  />
+                </Field>
+                <button
+                  type="button"
+                  onClick={() => saveMed("Logged")}
+                  className="mt-6 flex min-h-[64px] w-full items-center justify-center gap-2 rounded-[22px] bg-primary text-xl font-bold text-primary-foreground transition-transform active:scale-[0.99]"
+                >
+                  <Check className="size-6" /> Save medication
+                </button>
+              </>
+            )}
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
 
   return (
     <Drawer open={addOpen} onOpenChange={setAddOpen}>

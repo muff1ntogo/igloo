@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-rout
 import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowDownRight, ArrowUpRight, Minus, Share2, Stethoscope } from "lucide-react";
 import { METRICS, METRIC_ORDER, STATUS_META, type MetricKey } from "@/lib/igloo-data";
-import { useLatest } from "@/lib/igloo-store";
+import { useLatest, useIgloo } from "@/lib/igloo-store";
 import {
   average,
   DOCTOR_NOTE,
@@ -65,6 +65,7 @@ function MetricDetailPage() {
   const detail = METRIC_DETAIL[m];
   const router = useRouter();
   const latest = useLatest();
+  const { simpleView } = useIgloo();
   const reading = latest[m];
 
   const current = numericValue(m, reading?.value);
@@ -89,6 +90,54 @@ function MetricDetailPage() {
       return { ...d, data: w, delta };
     });
   }, [m, current]);
+
+  // Simple view: show just the big reading and status
+  if (simpleView) {
+    return (
+      <main className="pb-6">
+        <header className="flex items-center gap-2 px-4 pt-6 pb-4">
+          <button
+            type="button"
+            onClick={() => router.history.back()}
+            aria-label="Back"
+            className="flex size-14 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted"
+          >
+            <ArrowLeft className="size-7" />
+          </button>
+          <h1 className="flex-1 text-2xl font-bold tracking-tight text-foreground">{meta.label}</h1>
+        </header>
+        <div className="space-y-6 px-5 pt-2">
+          <div className="rounded-[22px] bg-card border border-border p-8 text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <MetricIcon metric={m} />
+            </div>
+            <p className="font-serif text-6xl leading-none tracking-tight text-foreground">
+              {reading?.value ?? "—"}
+              <span className="ml-2 font-sans text-xl font-semibold text-muted-foreground">
+                {meta.unit}
+              </span>
+            </p>
+            <p className="mt-4 text-xl font-semibold text-muted-foreground">
+              {reading?.at ?? "No readings yet"}
+            </p>
+            <div className="mt-5 flex justify-center">
+              <StatusBadge status={status} className="px-6 py-3 text-lg" />
+            </div>
+          </div>
+          <div className="rounded-[22px] bg-card border border-border p-6">
+            <h2 className="text-xl font-bold text-foreground">What this means</h2>
+            <p className="mt-3 text-lg text-foreground leading-relaxed">
+              {status === "good"
+                ? `Your ${meta.label.toLowerCase()} is in the normal range.`
+                : status === "watch"
+                  ? `Your ${meta.label.toLowerCase()} is a bit high. Rest and check again.`
+                  : `Your ${meta.label.toLowerCase()} needs attention. Contact your doctor if it stays high.`}
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="pb-6">

@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pill, Plus } from "lucide-react";
+import { Pill, Plus, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
 import {
   dayKeyOf,
   dayLabel,
@@ -68,7 +68,7 @@ function buildWeeks() {
 }
 
 function LogPage() {
-  const { readings, meds, openAdd } = useIgloo();
+  const { readings, meds, openAdd, simpleView } = useIgloo();
   const weeks = useMemo(buildWeeks, []);
   const today = todayKey();
   const [selected, setSelected] = useState(today);
@@ -82,6 +82,7 @@ function LogPage() {
     return s;
   }, [readings, meds]);
 
+  // All hooks must be called unconditionally - compute values needed for both views
   const dayEntries = useMemo(() => {
     const list: Entry[] = [
       ...readings
@@ -140,6 +141,13 @@ function LogPage() {
     node?.scrollIntoView({ block: "center", behavior: "smooth" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
+
+  // Simple mode: show only one day with big entries
+  if (simpleView) {
+    return (
+      <SimpleLog readings={readings} meds={meds} selected={selected} setSelected={setSelected} />
+    );
+  }
 
   return (
     <main>
@@ -239,6 +247,132 @@ function LogPage() {
     </main>
   );
 }
+
+// ============================================
+// SIMPLE LOG VIEW COMPONENTS
+// ============================================
+
+function SimpleEntryBlock({ entry }: { entry: Entry }) {
+  if (entry.kind === "medication") {
+    const m = entry.item;
+    return (
+      <div className="flex min-h-[80px] items-center gap-4 rounded-[22px] bg-primary p-5 text-primary-foreground">
+        <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-white/15">
+          <Pill className="size-6" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-lg font-bold">{m.name}</p>
+          <p className="text-base font-semibold text-primary-foreground/80">{m.dose}</p>
+        </div>
+        <span className="text-lg font-bold text-primary-foreground/90">{timeOf(m.at)}</span>
+      </div>
+    );
+  }
+
+  const r = entry.item;
+  const meta = METRICS[r.metric];
+  const Icon = METRIC_ICONS[r.metric];
+  return (
+    <div className="flex min-h-[80px] items-center gap-4 rounded-[22px] bg-sun p-5 text-foreground">
+      <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-foreground/10">
+        <Icon className="size-6 text-foreground" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-lg font-bold">{meta.label}</p>
+        <p className="font-serif text-2xl leading-tight">
+          {r.value}
+          <span className="ml-1 font-sans text-sm font-semibold text-foreground/70">
+            {meta.unit}
+          </span>
+        </p>
+      </div>
+      <span className="text-lg font-bold text-foreground/80">{timeOf(r.at)}</span>
+    </div>
+  );
+}
+
+function SimpleLog({
+  readings,
+  meds,
+  selected,
+  setSelected,
+}: {
+  readings: Reading[];
+  meds: MedLog[];
+  selected: string;
+  setSelected: (k: string) => void;
+}) {
+  const today = todayKey();
+  const getDateOffset = (key: string, offset: number) => {
+    const d = new Date(`${key}T12:00`);
+    d.setDate(d.getDate() + offset);
+    return localISO(d).slice(0, 10);
+  };
+  const prevDay = getDateOffset(selected, -1);
+  const nextDay = getDateOffset(selected, 1);
+  const dayEntries: Entry[] = useMemo(() => {
+    const list = [
+      ...readings
+        .filter((r) => dayKeyOf(r.at) === selected)
+        .map((r) => ({ kind: "measurement" as const, item: r })),
+      ...meds
+        .filter((m) => dayKeyOf(m.at) === selected)
+        .map((m) => ({ kind: "medication" as const, item: m })),
+    ];
+    return list.sort((a, b) => a.item.at.localeCompare(b.item.at));
+  }, [readings, meds, selected]);
+
+  return (
+    <main className="pb-8">
+      <div className="px-5 pt-4 pb-2">
+        <h1 className="text-3xl font-bold text-foreground leading-tight">{dayLabel(selected)}</h1>
+      </div>
+      <div className="space-y-5 px-5 pt-2">
+        <button
+          type="button"
+          onClick={() => setSelected(prevDay)}
+          className="flex min-h-[64px] w-full items-center justify-center gap-3 rounded-[22px] border border-border bg-card px-6 text-left transition-colors active:bg-muted"
+        >
+          <ChevronLeft className="size-6 text-foreground" />
+          <span className="text-xl font-semibold text-foreground">Previous Day</span>
+        </button>
+        {dayEntries.length === 0 ? (
+          <div className="rounded-[22px] border border-border bg-card p-8 text-center">
+            <span className="text-5xl">📝</span>
+            <p className="mt-4 text-xl font-semibold text-foreground leading-relaxed">
+              No readings logged this day
+            </p>
+            <p className="mt-2 text-lg text-foreground leading-relaxed">Tap below to add one</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {dayEntries.map((e) => (
+              <SimpleEntryBlock key={e.item.id} entry={e} />
+            ))}
+          </div>
+        )}
+        {selected !== today ? (
+          <button
+            type="button"
+            onClick={() => setSelected(nextDay)}
+            className="flex min-h-[64px] w-full items-center justify-center gap-3 rounded-[22px] border border-border bg-card px-6 text-left transition-colors active:bg-muted"
+          >
+            <span className="text-xl font-semibold text-foreground">Next Day</span>
+            <ChevronRight className="size-6 text-foreground" />
+          </button>
+        ) : (
+          <div className="rounded-[22px] bg-primary-tint p-5 text-center">
+            <p className="text-lg font-semibold text-foreground">This is today</p>
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+// ============================================
+// REGULAR ENTRY BLOCK
+// ============================================
 
 function EntryBlock({ entry }: { entry: Entry }) {
   if (entry.kind === "medication") {

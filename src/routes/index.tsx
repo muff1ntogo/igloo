@@ -1,8 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Check, ChevronRight, FileText, TriangleAlert, X } from "lucide-react";
 import {
-  DELTAS,
+  Check,
+  ChevronRight,
+  FileText,
+  TriangleAlert,
+  X,
+  MessageSquare,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
+import {
   dayKeyOf,
   fullDateToday,
   localISO,
@@ -10,7 +18,10 @@ import {
   METRIC_ORDER,
   STATUS_META,
   TRENDS,
+  DELTAS,
   type MetricKey,
+  type Reading,
+  type MedLog,
 } from "@/lib/igloo-data";
 import { useIgloo, useLatest, worstStatus } from "@/lib/igloo-store";
 import { BigNumber, MetricIcon, PageHeader, Sparkline, StatusBadge } from "@/components/igloo/ui";
@@ -20,13 +31,13 @@ import { ReportSheet } from "@/components/igloo/ReportSheet";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Today — Igloo" },
+      { title: "Today ??Igloo" },
       {
         name: "description",
         content:
           "Your vitals at a glance: blood pressure, heart rate, oxygen and glucose, with gentle status guidance.",
       },
-      { property: "og:title", content: "Today — Igloo" },
+      { property: "og:title", content: "Today ??Igloo" },
       {
         property: "og:description",
         content: "Your vitals at a glance, with gentle status guidance for you and your family.",
@@ -37,7 +48,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { simpleView, alertDismissed, dismissAlert, readings, meds } = useIgloo();
+  const { simpleView, alertDismissed, dismissAlert, readings, meds, openAdd } = useIgloo();
   const latest = useLatest();
   const [mode, setMode] = useState<"delta" | "status">("status");
   const [reportOpen, setReportOpen] = useState(false);
@@ -67,32 +78,40 @@ function Dashboard() {
       <PageHeader title="Good morning, Rosemary" subtitle={fullDateToday()} />
 
       <div className="space-y-5 px-5 pt-2">
-        {flagged.length > 0 && !alertDismissed ? (
-          <div className="flex items-start gap-3 rounded-[22px] border border-border bg-watch-tint p-4">
-            <TriangleAlert className="mt-0.5 size-5 shrink-0 text-watch" />
-            <div className="flex-1">
-              <p className="text-sm font-bold text-foreground">
-                {METRICS[flagged[0] as MetricKey].label} is worth a look
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                It came in a little higher than usual. Rest a few minutes and take it again.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={dismissAlert}
-              aria-label="Dismiss alert"
-              className="-m-2 flex size-11 items-center justify-center rounded-full text-muted-foreground"
-            >
-              <X className="size-5" />
-            </button>
-          </div>
-        ) : null}
-
         {simpleView ? (
-          <SimpleCard overall={overall} />
+          <SimpleDashboard
+            overall={overall}
+            flagged={flagged}
+            alertDismissed={alertDismissed}
+            dismissAlert={dismissAlert}
+            latest={latest}
+            readings={readings}
+            meds={meds}
+            openAdd={openAdd}
+          />
         ) : (
           <>
+            {flagged.length > 0 && !alertDismissed ? (
+              <div className="flex items-start gap-3 rounded-[22px] border border-border bg-watch-tint p-4">
+                <TriangleAlert className="mt-0.5 size-5 shrink-0 text-watch" />
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-foreground">
+                    {METRICS[flagged[0] as MetricKey].label} is worth a look
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    It came in a little higher than usual. Rest a few minutes and take it again.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={dismissAlert}
+                  aria-label="Dismiss alert"
+                  className="-m-2 flex size-11 items-center justify-center rounded-full text-muted-foreground"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+            ) : null}
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-base font-bold text-foreground">Your readings</h2>
               <div className="flex rounded-full border border-border bg-card p-1">
@@ -169,7 +188,7 @@ function Dashboard() {
                           : "bg-muted text-muted-foreground",
                     )}
                   >
-                    {count > 0 ? count : "–"}
+                    {count > 0 ? count : "—"}
                   </div>
                   <span className="text-[11px] font-semibold text-muted-foreground">
                     {day.letter}
@@ -228,51 +247,122 @@ function Dashboard() {
   );
 }
 
-function SimpleCard({ overall }: { overall: "good" | "watch" | "urgent" }) {
+function SimpleDashboard({
+  overall,
+  flagged,
+  alertDismissed,
+  dismissAlert,
+  latest,
+  readings,
+  meds,
+  openAdd,
+}: {
+  overall: "good" | "watch" | "urgent";
+  flagged: MetricKey[];
+  alertDismissed: boolean;
+  dismissAlert: () => void;
+  latest: Record<MetricKey, Reading | undefined>;
+  readings: Reading[];
+  meds: MedLog[];
+  openAdd: () => void;
+}) {
   const meta = STATUS_META[overall];
-  const latest = useLatest();
+
+  // Calculate weekly consistency
+  const weekKeys: string[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    weekKeys.push(localISO(d).slice(0, 10));
+  }
+  const loggedDays = new Set([
+    ...readings.map((r) => dayKeyOf(r.at)),
+    ...meds.map((m) => dayKeyOf(m.at)),
+  ]);
+  const daysLogged = weekKeys.filter((k) => loggedDays.has(k)).length;
+
+  // Generate plain-language status sentence
+  let statusSentence = "";
+  if (overall === "good") {
+    statusSentence = "Everything looks good today";
+  } else if (flagged.length === 1 && flagged[0]) {
+    const metricLabel = METRICS[flagged[0]].label.toLowerCase();
+    statusSentence = `Your ${metricLabel} was a bit high yesterday`;
+  } else {
+    statusSentence = "A few readings need attention";
+  }
+
+  // Get mascot emoji based on overall status
+  const mascot = overall === "good" ? "😊" : overall === "watch" ? "😐" : "😟";
+
   return (
-    <section className="card-igloo p-6 text-center">
-      <div
-        className={cn(
-          "mx-auto flex size-20 items-center justify-center rounded-full",
-          overall === "good"
-            ? "bg-good-tint"
-            : overall === "watch"
-              ? "bg-watch-tint"
-              : "bg-urgent-tint",
-        )}
-      >
-        <span className={cn("font-serif text-3xl", meta.text)}>
-          {overall === "good" ? "✓" : "!"}
-        </span>
-      </div>
-      <h2 className="mt-5 text-2xl font-bold text-foreground">
-        {overall === "good" ? "Everything looks steady" : "One reading needs a look"}
-      </h2>
-      <p className="mt-2 text-base text-muted-foreground">
-        {overall === "good"
-          ? "All four of today's readings are in your usual range."
-          : "Take a rest, then check that reading again in a few minutes."}
-      </p>
-      <StatusBadge status={overall} className="mt-4 px-4 py-2 text-sm" />
-      <div className="mt-6 space-y-3 text-left">
-        {METRIC_ORDER.map((m) => (
-          <div key={m} className="flex items-center gap-4 rounded-2xl bg-background p-3">
-            <MetricIcon metric={m} />
+    <div className="space-y-6 px-5 pt-2">
+      {/* Alert banner at top if needed - larger type scale */}
+      {flagged.length > 0 && !alertDismissed ? (
+        <div className="rounded-[22px] border border-border bg-watch-tint p-6">
+          <div className="flex items-start gap-4">
+            <AlertCircle className="mt-1 size-7 shrink-0 text-watch" />
             <div className="flex-1">
-              <p className="text-sm font-bold text-foreground">{METRICS[m].label}</p>
-              <p className="font-serif text-xl text-foreground">
-                {latest[m]?.value ?? "—"}
-                <span className="ml-1 font-sans text-xs font-semibold text-muted-foreground">
-                  {METRICS[m].unit}
-                </span>
+              <p className="text-xl font-bold text-foreground leading-relaxed">
+                {METRICS[flagged[0] as MetricKey].label} needs attention
+              </p>
+              <p className="mt-2 text-lg text-foreground leading-relaxed">
+                It came in a little higher than usual. Rest a few minutes and take it again.
               </p>
             </div>
-            <StatusBadge status={latest[m]?.status ?? "good"} />
+            <button
+              type="button"
+              onClick={dismissAlert}
+              aria-label="Dismiss alert"
+              className="-m-2 flex size-14 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted"
+            >
+              <X className="size-6" />
+            </button>
           </div>
-        ))}
+        </div>
+      ) : null}
+
+      {/* Greeting, date, and large mascot */}
+      <div className="text-center space-y-4">
+        <div className="flex items-center justify-center gap-3">
+          <span className="text-6xl" aria-hidden="true">
+            {mascot}
+          </span>
+        </div>
+        <h1 className="text-3xl font-bold text-foreground leading-tight">Good morning, Rosemary</h1>
+        <p className="text-xl text-foreground">{fullDateToday()}</p>
       </div>
-    </section>
+
+      {/* One big plain-language status line */}
+      <div className="rounded-[22px] bg-primary-tint p-6 text-center">
+        <p className="text-2xl font-semibold text-foreground leading-relaxed">{statusSentence}</p>
+      </div>
+
+      {/* One dominant, full-width "Log a Reading" button */}
+      <button
+        type="button"
+        onClick={() => openAdd()}
+        className="block rounded-[22px] bg-primary px-8 py-6 text-center transition-transform active:scale-[0.98]"
+      >
+        <div className="flex items-center justify-center gap-3">
+          <span className="flex size-10 items-center justify-center rounded-full bg-primary-foreground/20">
+            <MessageSquare className="size-5 text-primary-foreground" />
+          </span>
+          <span className="text-2xl font-bold text-primary-foreground">Log a Reading</span>
+        </div>
+      </button>
+
+      {/* Weekly consistency as one plain sentence */}
+      <div className="rounded-[22px] bg-card border border-border p-6 text-center">
+        <p className="text-xl font-semibold text-foreground leading-relaxed">
+          You've logged {daysLogged} of the last 7 days
+        </p>
+      </div>
+
+      {/* Back navigation to full view hint */}
+      <p className="text-center text-lg text-foreground">
+        <span className="underline decoration-dotted">Tap to see detailed readings</span>
+      </p>
+    </div>
   );
 }
